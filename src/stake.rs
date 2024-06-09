@@ -144,21 +144,22 @@ pub fn process_stake_accounts_info_for_staker(
             if let StakeStateV2::Stake(_, stake, _) = stake_state {
                 let activation_epoch = stake.delegation.activation_epoch;
                 let deactivation_epoch = stake.delegation.deactivation_epoch;
-                if deactivation_epoch > epoch && stake.delegation.stake > 1000000000 {
+                if deactivation_epoch > epoch
+                    && stake.delegation.stake > 1000000000
+                    && stake_pubkey.to_bytes().len() == 32
+                {
                     epoch_to_pubkey_map.insert(activation_epoch, *stake_pubkey);
                 }
             }
         }
     }
 
-    if let Some(&pubkey) = epoch_to_pubkey_map.get(&(epoch - 11)) {
+    if let Some(&pubkey) = epoch_to_pubkey_map.get(&(epoch - 15)) {
         return Some(pubkey);
     }
 
     let mut epochs: Vec<(&u64, &Pubkey)> = epoch_to_pubkey_map.iter().collect();
-    println!("{:?}", epoch_to_pubkey_map);
     epochs.sort_by_key(|&(epoch, _)| *epoch);
-    println!("{:?}", epochs);
     epochs.first().map(|&(_, pubkey)| *pubkey)
 }
 
